@@ -31,7 +31,7 @@
             --tag-bg: rgba(242, 101, 34, 0.09);
             --card-border: rgba(242, 101, 34, 0.22);
             --shadow-subtle: 0 6px 20px rgba(184, 31, 27, 0.06);
-            --header-h: 178px; /* ارتفاع الهيدر لتثبيت شريط الأقسام تحته مباشرة */
+            --header-h: 178px;
         }
 
         body.dark-mode {
@@ -308,6 +308,17 @@
             border-radius: 14px;
             border-right: 4px solid var(--accent);
         }
+        .no-price-info-tag {
+            background: #fff3cd;
+            color: #856404;
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px dashed #ffebaa;
+            margin-top: 5px;
+        }
 
         /* صف الأحجام والأوزان الأفقي */
         .sizes-row { 
@@ -431,6 +442,39 @@
 
         .fly-item { position: fixed; z-index: 9999; pointer-events: none; width: 30px; height: 30px; background: var(--orange); color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1); }
 
+        /* --- إشعار الهدايا الجذاب (Gift Toast Popup) --- */
+        #gift-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #28a745;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 0.92rem;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 90%;
+            text-align: right;
+            border: 2px solid #ffffff;
+        }
+        #gift-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .gift-toast-icon {
+            font-size: 1.8rem;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.2); } }
+
         /* --- شريط التثبيت الذكي --- */
         #install-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; background: var(--accent);
@@ -498,6 +542,7 @@
         .cart-item-name { font-weight: 700; font-size: 0.9rem; color: var(--main-text); }
         .cart-item-price { color: var(--orange-dark); font-weight: 800; font-size: 0.88rem; display: block; }
         .cart-item-note-pill { font-size: 0.72rem; color: var(--accent); font-weight: 700; display: block; margin-top: 2px; }
+        .gift-cart-pill { background: #28a745; color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; display: inline-block; margin-top: 4px; }
         .remove-btn { color: #d32f2f; font-weight: 800; font-size: 0.78rem; cursor: pointer; }
 
         .order-type-container { display: flex; background: var(--tag-bg); padding: 6px; border-radius: 16px; margin: 15px 0; gap: 6px; border: 1px solid var(--card-border); }
@@ -522,6 +567,15 @@
         </div>
     </div>
 
+    <!-- نافذة الإشعارات للهدايا العائمة -->
+    <div id="gift-toast">
+        <span class="gift-toast-icon">🎁</span>
+        <div>
+            <div>مبارك! حصلت على هدية مجانية:</div>
+            <div id="gift-toast-text" style="color: #ffeb3b; font-size: 0.95rem;"></div>
+        </div>
+    </div>
+
     <!-- الهيدر الرئيسي -->
     <header id="mainHeader">
         <div class="header-top">
@@ -542,7 +596,7 @@
         </div>
     </header>
 
-    <!-- شريط تصفح الأقسام الأفقي الثابت دائماً -->
+    <!-- شريط تصفح الأقسام الأفقي الثابت -->
     <div class="category-nav" id="catNav"></div>
 
     <div id="menuList" class="menu-list"></div>
@@ -562,7 +616,7 @@
         </div>
     </div>
 
-    <!-- الفروع وأرقام التواصل بأسفل الصفحة بالكامل -->
+    <!-- الفروع وأرقام التواصل -->
     <footer class="restaurant-footer">
         <div class="footer-branches-container">
             <div class="footer-branch-item">
@@ -599,6 +653,9 @@
         <div class="modal-content">
             <h2 style="margin-bottom: 20px; color: var(--accent);">طلباتك</h2>
             <div id="cartItemsList"></div>
+            
+            <div id="earnedGiftsContainer"></div>
+
             <div style="margin: 20px 0; padding: 15px; background: var(--tag-bg); border-radius: 18px; display: flex; justify-content: space-between; border: 1px solid var(--card-border);">
                 <b>المجموع</b>
                 <b id="totalAmount" style="color: var(--orange-dark);">0 ج.م</b>
@@ -623,15 +680,15 @@
     </div>
 
     <script>
-        // رابط الشيت الجديد
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFMiFrq1Dw5y3MpXKKbVIdbxMUqb6UKkwHpL6_0IprzgSvfnKBY3_s0xRTdUUQGmSRgo8yId6gTQg0/pub?output=csv';
         const IMAGES_PATH = "./images/"; 
         let menuData = [], cart = [];
         let currentTotal = 0; 
         let deferredPrompt;
         let selectedOrderType = 'delivery';
+        let earnedGiftsList = [];
+        let previousGiftKeys = new Set();
 
-        // ضبط مكان تثبيت شريط الأقسام ديناميكياً أسفل الهيدر مباشرة
         function adjustStickyCatNav() {
             const header = document.getElementById('mainHeader');
             const catNav = document.getElementById('catNav');
@@ -715,8 +772,6 @@
             return str.toString().trim().replace(/[\u200B-\u200D\uFEFF]/g, '');
         }
 
-        // قراءة أسعار وأحجام الشيت بدقة
-        // ترتيب الأعمدة: 0: القسم | 1: الصنف | 2: الوصف | 3: السعر | 4: صغير | 5: وسط | 6: كبير | 7: تمن | 8: ربع | 9: نص | 10: كيلو
         function resolveItemSizesFromCols(cols) {
             const singlePrice = cleanStr(cols[3]);
             const sizesConfig = [
@@ -815,13 +870,15 @@
                 el.classList.add('active'); 
             }
             
-            // التثبت إذا كان القسم هو قسم العروض (أو يحتوي اسمه على كلمة عروض)
             const isOfferCategory = cat.includes('عروض') || cat.toLowerCase().includes('offer');
 
             document.getElementById('menuList').innerHTML = menuData.filter(i => i.category === cat).map(item => {
                 let defaultLabel = item.sizes.length > 0 ? item.sizes[0].label : '';
                 let defaultPrice = item.sizes.length > 0 ? item.sizes[0].price : '0';
                 
+                // فحص هل المنتج يحتوي على سعر صالح أم مجاني/عرض إرشادي بدون سعر
+                const hasValidPrice = parseFloat(defaultPrice) > 0;
+
                 let sizesHtml = '';
                 if (item.sizes.length > 1 || (item.sizes.length === 1 && item.sizes[0].label !== '')) {
                     sizesHtml = `<div class="sizes-row">` + 
@@ -842,19 +899,22 @@
                         <div class="offer-details">
                             <div class="offer-header-row">
                                 <span class="offer-title">${item.name}</span>
-                                <span class="food-price offer-price-tag">${defaultPrice} ج.م</span>
+                                ${hasValidPrice ? `<span class="food-price offer-price-tag">${defaultPrice} ج.م</span>` : ''}
                             </div>
                             
                             ${item.desc ? `<div class="offer-desc-text">✨ ${item.desc}</div>` : ''}
                             
                             ${sizesHtml}
 
-                            <div class="item-notes-wrapper">
-                                <span class="item-notes-icon">✍️</span>
-                                <input type="text" class="item-notes-input" placeholder="ملاحظات العرض (مثل بيبسي زيرو، بدون مخلل...)">
-                            </div>
-
-                            <button class="order-btn offer-btn-style" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب العرض الآن 🔥</button>
+                            ${hasValidPrice ? `
+                                <div class="item-notes-wrapper">
+                                    <span class="item-notes-icon">✍️</span>
+                                    <input type="text" class="item-notes-input" placeholder="ملاحظات العرض (مثل بيبسي زيرو، بدون مخلل...)">
+                                </div>
+                                <button class="order-btn offer-btn-style" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب العرض الآن 🔥</button>
+                            ` : `
+                                <div class="no-price-info-tag">🎁 عرض هدايا تلقائي - يُضاف للمنيو طبقاً لشروط العروض!</div>
+                            `}
                         </div>
                     </div>`;
                 }
@@ -870,21 +930,25 @@
                             <div>
                                 <div class="food-header">
                                     <span class="food-name">${item.name}</span>
-                                    <span class="food-price">${defaultPrice} ج.م</span>
+                                    ${hasValidPrice ? `<span class="food-price">${defaultPrice} ج.م</span>` : ''}
                                 </div>
                                 ${sizesHtml}
                             </div>
+                            ${hasValidPrice ? `
                             <div class="food-bottom-action">
                                 <button class="order-btn" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب</button>
                             </div>
+                            ` : ''}
                         </div>
                     </div>
                     ${item.desc ? `<div class="card-full-desc">${item.desc}</div>` : ''}
                     
+                    ${hasValidPrice ? `
                     <div class="item-notes-wrapper">
                         <span class="item-notes-icon">✍️</span>
                         <input type="text" class="item-notes-input" placeholder="ملاحظاتك الخاصة للصنف (بدون بصل، سبايسي زيادة...)">
                     </div>
+                    ` : ''}
                 </div>`;
             }).join('');
         }
@@ -895,7 +959,8 @@
             btn.classList.add('active');
             
             const card = btn.closest('.food-card') || btn.closest('.offer-card'); 
-            card.querySelector('.food-price').innerText = price + ' ج.م';
+            const priceEl = card.querySelector('.food-price');
+            if (priceEl) priceEl.innerText = price + ' ج.م';
             card.dataset.size = size; 
             card.dataset.price = price;
         }
@@ -910,7 +975,7 @@
             const note = noteInput ? noteInput.value.trim() : '';
             
             let finalName = (size && size.trim() !== '') ? `${name} (${size})` : name; 
-            cart.push({name: finalName, price: price, img: img, category: category, note: note});
+            cart.push({name: finalName, rawName: name, size: size, price: price, img: img, category: category, note: note});
             
             if(noteInput) noteInput.value = '';
 
@@ -944,6 +1009,105 @@
             }, 700);
         }
 
+        /* --- محرك حساب واكتشاف الهدايا والتنبيه الفوري --- */
+        function checkGiftsLogic() {
+            earnedGiftsList = [];
+            const currentGiftKeys = new Set();
+
+            // 1. حساب وجبات الكريب (أي وجبتين كريب عليهم كريب بانيه بطاطس هديه)
+            const crepeCount = cart.filter(i => (i.category && i.category.includes('كريب')) || (i.name && i.name.includes('كريب'))).length;
+            const crepeGifts = Math.floor(crepeCount / 2);
+            if (crepeGifts > 0) {
+                const giftTitle = `كريب بانيه بطاطس هدية 🎁${crepeGifts > 1 ? ` (عدد ${crepeGifts})` : ''}`;
+                earnedGiftsList.push(giftTitle);
+                currentGiftKeys.add('crepe_' + crepeGifts);
+            }
+
+            // 2. حساب البيتزا الكبير (2 بيتزا كبير عليهم بيتزا مارجريتا كبير هديه)
+            const pizzaLargeCount = cart.filter(i => 
+                ((i.category && i.category.includes('بيتزا')) || (i.name && i.name.includes('بيتزا'))) && 
+                i.size === 'كبير'
+            ).length;
+            const pizzaLargeGifts = Math.floor(pizzaLargeCount / 2);
+            if (pizzaLargeGifts > 0) {
+                const giftTitle = `بيتزا مارجريتا كبير هدية 🎁${pizzaLargeGifts > 1 ? ` (عدد ${pizzaLargeGifts})` : ''}`;
+                earnedGiftsList.push(giftTitle);
+                currentGiftKeys.add('pizza_large_' + pizzaLargeGifts);
+            }
+
+            // 3. حساب بيتزا مارجريتا وسط (2 بيتزا مارجريتا وسط عليهم بيتزا مارجريتا وسط هديه)
+            const margheritaMediumCount = cart.filter(i => 
+                i.rawName && i.rawName.includes('مارجريتا') && 
+                i.size === 'وسط'
+            ).length;
+            const margheritaMediumGifts = Math.floor(margheritaMediumCount / 2);
+            if (margheritaMediumGifts > 0) {
+                const giftTitle = `بيتزا مارجريتا وسط هدية 🎁${margheritaMediumGifts > 1 ? ` (عدد ${margheritaMediumGifts})` : ''}`;
+                earnedGiftsList.push(giftTitle);
+                currentGiftKeys.add('margherita_med_' + margheritaMediumGifts);
+            }
+
+            // 4. حساب البروست (أي وجبتين بروست عليهم وجبه استربس قطعتين هديه)
+            const broastCount = cart.filter(i => 
+                ((i.category && i.category.includes('بروست')) || (i.name && i.name.includes('بروست'))) &&
+                !i.name.includes('سنجل')
+            ).length;
+            const broastGifts = Math.floor(broastCount / 2);
+            if (broastGifts > 0) {
+                const giftTitle = `وجبة استربس قطعتين هدية 🎁${broastGifts > 1 ? ` (عدد ${broastGifts})` : ''}`;
+                earnedGiftsList.push(giftTitle);
+                currentGiftKeys.add('broast_' + broastGifts);
+            }
+
+            // 5. حساب بروست سنجل (2 بروست سنجل وخد ال 3 هديه)
+            const broastSingleCount = cart.filter(i => i.name && i.name.includes('بروست') && i.name.includes('سنجل')).length;
+            const broastSingleGifts = Math.floor(broastSingleCount / 2);
+            if (broastSingleGifts > 0) {
+                const giftTitle = `وجبة بروست سنجل (الوجبة الـ 3) هدية 🎁${broastSingleGifts > 1 ? ` (عدد ${broastSingleGifts})` : ''}`;
+                earnedGiftsList.push(giftTitle);
+                currentGiftKeys.add('broast_single_' + broastSingleGifts);
+            }
+
+            // 6. حساب وجبات عربي (وجبتين عربي عليهم وجبه هديه)
+            const arabiCount = cart.filter(i => (i.category && i.category.includes('عربي')) || (i.name && i.name.includes('عربي'))).length;
+            const arabiGifts = Math.floor(arabiCount / 2);
+            if (arabiGifts > 0) {
+                const giftTitle = `وجبة عربي هدية 🎁${arabiGifts > 1 ? ` (عدد ${arabiGifts})` : ''}`;
+                earnedGiftsList.push(giftTitle);
+                currentGiftKeys.add('arabi_' + arabiGifts);
+            }
+
+            // 7. حساب شاورما كيزر (4 شاورما كيزر عليهم 4 هديه)
+            const kaiserCount = cart.filter(i => i.name && i.name.includes('كيزر')).length;
+            const kaiserGifts = Math.floor(kaiserCount / 4);
+            if (kaiserGifts > 0) {
+                const giftTitle = `4 شاورما كيزر هدية 🎁${kaiserGifts > 1 ? ` (مضاعف x${kaiserGifts})` : ''}`;
+                earnedGiftsList.push(giftTitle);
+                currentGiftKeys.add('kaiser_' + kaiserGifts);
+            }
+
+            // إظهار الإشعار المنبثق للهدايا الجديدة فقط
+            currentGiftKeys.forEach(key => {
+                if (!previousGiftKeys.has(key)) {
+                    const giftText = earnedGiftsList[earnedGiftsList.length - 1];
+                    showGiftToast(giftText);
+                }
+            });
+            previousGiftKeys = currentGiftKeys;
+        }
+
+        function showGiftToast(text) {
+            const toast = document.getElementById('gift-toast');
+            const toastText = document.getElementById('gift-toast-text');
+            if (toast && toastText) {
+                toastText.innerText = text;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 4000);
+            }
+        }
+
         function updateCart() {
             const badge = document.getElementById('cartBadge'); 
             badge.innerText = cart.length; 
@@ -964,6 +1128,21 @@
                 </div>`;
             }).join('');
             
+            // تحديث الهدايا والمكافآت المستحقة
+            checkGiftsLogic();
+
+            const giftsContainer = document.getElementById('earnedGiftsContainer');
+            if (earnedGiftsList.length > 0) {
+                giftsContainer.innerHTML = `
+                    <div style="margin: 15px 0; padding: 12px; background: #e8f5e9; border-radius: 16px; border: 1px solid #c8e6c9;">
+                        <b style="color: #2e7d32; display: block; margin-bottom: 6px; font-size: 0.88rem;">🎉 الهدايا المستحقة مع طلبك:</b>
+                        ${earnedGiftsList.map(g => `<div class="gift-cart-pill">🎁 ${g}</div>`).join(' ')}
+                    </div>
+                `;
+            } else {
+                giftsContainer.innerHTML = '';
+            }
+
             document.getElementById('totalAmount').innerText = `${currentTotal} ج.م`;
         }
 
@@ -1041,6 +1220,12 @@
                 return line;
             }).join('\n') + `\n`;
             
+            if (earnedGiftsList.length > 0) {
+                msg += `-------------------------\n`;
+                msg += `🎁 *الهدايا المستحقة تلقائياً:* \n`;
+                msg += earnedGiftsList.map(g => `✨ ${g}`).join('\n') + `\n`;
+            }
+
             msg += `-------------------------\n\n`;
             msg += `💰 *الإجمالي النهائي:* *${currentTotal} ج.م*\n\n`;
             msg += `نأمل أن تنال خدمتنا رضاكم دائماً. ✨`;
