@@ -231,7 +231,7 @@
             display: inline-block; 
         }
         
-        /* --- تصميم كروت قسم العروض (المميز) --- */
+        /* --- تصميم كروت قسم العروض (ظهور الصورة بالكامل دون قص الأطراف) --- */
         .offer-card {
             background: var(--white);
             border-radius: 24px;
@@ -259,19 +259,25 @@
         }
         .offer-img-box {
             width: 100%;
-            height: 210px;
+            height: auto;
+            min-height: 180px;
+            max-height: 380px;
             overflow: hidden;
-            background: #f7ece5;
+            background: #1a1512; /* خلفية متناسقة تظهر أطراف الصورة بأناقة */
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .offer-img-box img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            max-height: 380px;
+            object-fit: contain; /* إظهار الصورة بالكامل دون قص أي طرف */
             transition: transform 0.4s ease;
         }
         .offer-card:hover .offer-img-box img {
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
         .offer-details {
             padding: 16px 16px 0 16px;
@@ -876,7 +882,6 @@
                 let defaultLabel = item.sizes.length > 0 ? item.sizes[0].label : '';
                 let defaultPrice = item.sizes.length > 0 ? item.sizes[0].price : '0';
                 
-                // فحص هل المنتج يحتوي على سعر صالح أم مجاني/عرض إرشادي بدون سعر
                 const hasValidPrice = parseFloat(defaultPrice) > 0;
 
                 let sizesHtml = '';
@@ -888,7 +893,7 @@
                     `</div>`;
                 }
 
-                // تصميم كروت العروض المميزة ذات الصورة الكبيرة
+                // تصميم كروت العروض المميزة ذات الصورة الكاملة غير المقصوصة
                 if (isOfferCategory) {
                     return `
                     <div class="offer-card" id="${item.id}" data-category="${item.category}" data-size="${defaultLabel}" data-price="${defaultPrice}">
@@ -1014,7 +1019,7 @@
             earnedGiftsList = [];
             const currentGiftKeys = new Set();
 
-            // 1. حساب وجبات الكريب (أي وجبتين كريب عليهم كريب بانيه بطاطس هديه)
+            // 1. حساب وجبات الكريب
             const crepeCount = cart.filter(i => (i.category && i.category.includes('كريب')) || (i.name && i.name.includes('كريب'))).length;
             const crepeGifts = Math.floor(crepeCount / 2);
             if (crepeGifts > 0) {
@@ -1023,7 +1028,7 @@
                 currentGiftKeys.add('crepe_' + crepeGifts);
             }
 
-            // 2. حساب البيتزا الكبير (2 بيتزا كبير عليهم بيتزا مارجريتا كبير هديه)
+            // 2. حساب البيتزا الكبير
             const pizzaLargeCount = cart.filter(i => 
                 ((i.category && i.category.includes('بيتزا')) || (i.name && i.name.includes('بيتزا'))) && 
                 i.size === 'كبير'
@@ -1035,7 +1040,7 @@
                 currentGiftKeys.add('pizza_large_' + pizzaLargeGifts);
             }
 
-            // 3. حساب بيتزا مارجريتا وسط (2 بيتزا مارجريتا وسط عليهم بيتزا مارجريتا وسط هديه)
+            // 3. حساب بيتزا مارجريتا وسط
             const margheritaMediumCount = cart.filter(i => 
                 i.rawName && i.rawName.includes('مارجريتا') && 
                 i.size === 'وسط'
@@ -1047,7 +1052,7 @@
                 currentGiftKeys.add('margherita_med_' + margheritaMediumGifts);
             }
 
-            // 4. حساب البروست (أي وجبتين بروست عليهم وجبه استربس قطعتين هديه)
+            // 4. حساب البروست
             const broastCount = cart.filter(i => 
                 ((i.category && i.category.includes('بروست')) || (i.name && i.name.includes('بروست'))) &&
                 !i.name.includes('سنجل')
@@ -1059,7 +1064,7 @@
                 currentGiftKeys.add('broast_' + broastGifts);
             }
 
-            // 5. حساب بروست سنجل (2 بروست سنجل وخد ال 3 هديه)
+            // 5. حساب بروست سنجل
             const broastSingleCount = cart.filter(i => i.name && i.name.includes('بروست') && i.name.includes('سنجل')).length;
             const broastSingleGifts = Math.floor(broastSingleCount / 2);
             if (broastSingleGifts > 0) {
@@ -1068,7 +1073,7 @@
                 currentGiftKeys.add('broast_single_' + broastSingleGifts);
             }
 
-            // 6. حساب وجبات عربي (وجبتين عربي عليهم وجبه هديه)
+            // 6. حساب وجبات عربي
             const arabiCount = cart.filter(i => (i.category && i.category.includes('عربي')) || (i.name && i.name.includes('عربي'))).length;
             const arabiGifts = Math.floor(arabiCount / 2);
             if (arabiGifts > 0) {
@@ -1077,7 +1082,7 @@
                 currentGiftKeys.add('arabi_' + arabiGifts);
             }
 
-            // 7. حساب شاورما كيزر (4 شاورما كيزر عليهم 4 هديه)
+            // 7. حساب شاورما كيزر
             const kaiserCount = cart.filter(i => i.name && i.name.includes('كيزر')).length;
             const kaiserGifts = Math.floor(kaiserCount / 4);
             if (kaiserGifts > 0) {
@@ -1086,7 +1091,6 @@
                 currentGiftKeys.add('kaiser_' + kaiserGifts);
             }
 
-            // إظهار الإشعار المنبثق للهدايا الجديدة فقط
             currentGiftKeys.forEach(key => {
                 if (!previousGiftKeys.has(key)) {
                     const giftText = earnedGiftsList[earnedGiftsList.length - 1];
@@ -1128,7 +1132,6 @@
                 </div>`;
             }).join('');
             
-            // تحديث الهدايا والمكافآت المستحقة
             checkGiftsLogic();
 
             const giftsContainer = document.getElementById('earnedGiftsContainer');
