@@ -136,7 +136,7 @@
         }
         .badge.show { transform: scale(1); }
 
-        /* --- شريط تصفح الأقسام الأفقي (ثابت كلياً تحت الهيدر ولا يتحرك نهائياً) --- */
+        /* --- شريط تصفح الأقسام الأفقي --- */
         .category-nav { 
             display: flex; 
             overflow-x: auto; 
@@ -173,7 +173,7 @@
         
         .menu-list { padding: 18px 15px; max-width: 600px; margin: auto; }
         
-        /* الكروت */
+        /* الكروت العادية */
         .food-card { 
             background: var(--white); 
             border-radius: 22px; 
@@ -231,6 +231,84 @@
             display: inline-block; 
         }
         
+        /* --- تصميم كروت قسم العروض (المميز) --- */
+        .offer-card {
+            background: var(--white);
+            border-radius: 24px;
+            margin-bottom: 22px;
+            padding: 0 0 16px 0;
+            box-shadow: 0 8px 25px rgba(216, 43, 39, 0.12);
+            border: 2px solid var(--orange);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .offer-badge-tag {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.78rem;
+            font-weight: 900;
+            padding: 4px 14px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            z-index: 2;
+        }
+        .offer-img-box {
+            width: 100%;
+            height: 210px;
+            overflow: hidden;
+            background: #f7ece5;
+            position: relative;
+        }
+        .offer-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .offer-card:hover .offer-img-box img {
+            transform: scale(1.03);
+        }
+        .offer-details {
+            padding: 16px 16px 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .offer-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .offer-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--accent);
+        }
+        .offer-price-tag {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--orange-dark);
+            background: var(--tag-bg);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+        .offer-desc-text {
+            background: var(--tag-bg);
+            color: var(--desc-text);
+            font-size: 0.82rem;
+            font-weight: 700;
+            line-height: 1.5;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border-right: 4px solid var(--accent);
+        }
+
         /* صف الأحجام والأوزان الأفقي */
         .sizes-row { 
             display: flex; 
@@ -284,6 +362,12 @@
             cursor: pointer; 
             transition: background 0.3s ease, box-shadow 0.3s ease; 
             box-shadow: 0 3px 8px rgba(216, 43, 39, 0.25);
+        }
+        .order-btn.offer-btn-style {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.95rem;
+            border-radius: 14px;
         }
         .order-btn:hover { background: var(--accent-hover); }
         .order-btn.added { background: #1f5e27; color: white; box-shadow: 0 4px 10px rgba(31, 94, 39, 0.3); }
@@ -483,7 +567,7 @@
         <div class="footer-branches-container">
             <div class="footer-branch-item">
                 <div class="footer-branch-title">📍 عنوان المطعم</div>
-                <p class="footer-branch-addr">قنا - قفط شارع المحطه أمام الاوتوبيس أعلي قاعه القصر  الدور الثاني </p>
+                <p class="footer-branch-addr">قنا - قفط شارع المحطه أمام الاوتوبيس أعلي قاعه القصر الدور الثاني </p>
             </div>
             <div style="margin-top: 15px; border-top: 1px dashed rgba(242, 101, 34, 0.35); padding-top: 14px;">
                 <div class="footer-branch-title" style="margin-bottom: 8px;">📞 أرقام التواصل والطلبات:</div>
@@ -539,7 +623,8 @@
     </div>
 
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQedMdGjhY94Ec3vgQHzlbNwUqlJwJGiSSTtoPWISgmC-47hWSRV05fpSRNUIAMApbk3CWOWV1U4byu/pub?output=csv';
+        // رابط الشيت الجديد
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQFMiFrq1Dw5y3MpXKKbVIdbxMUqb6UKkwHpL6_0IprzgSvfnKBY3_s0xRTdUUQGmSRgo8yId6gTQg0/pub?output=csv';
         const IMAGES_PATH = "./images/"; 
         let menuData = [], cart = [];
         let currentTotal = 0; 
@@ -730,6 +815,9 @@
                 el.classList.add('active'); 
             }
             
+            // التثبت إذا كان القسم هو قسم العروض (أو يحتوي اسمه على كلمة عروض)
+            const isOfferCategory = cat.includes('عروض') || cat.toLowerCase().includes('offer');
+
             document.getElementById('menuList').innerHTML = menuData.filter(i => i.category === cat).map(item => {
                 let defaultLabel = item.sizes.length > 0 ? item.sizes[0].label : '';
                 let defaultPrice = item.sizes.length > 0 ? item.sizes[0].price : '0';
@@ -743,6 +831,35 @@
                     `</div>`;
                 }
 
+                // تصميم كروت العروض المميزة ذات الصورة الكبيرة
+                if (isOfferCategory) {
+                    return `
+                    <div class="offer-card" id="${item.id}" data-category="${item.category}" data-size="${defaultLabel}" data-price="${defaultPrice}">
+                        <div class="offer-badge-tag">🔥 عرض خاص</div>
+                        <div class="offer-img-box">
+                            <img src="${item.img}" onerror="this.src='${IMAGES_PATH}default.jpg'">
+                        </div>
+                        <div class="offer-details">
+                            <div class="offer-header-row">
+                                <span class="offer-title">${item.name}</span>
+                                <span class="food-price offer-price-tag">${defaultPrice} ج.م</span>
+                            </div>
+                            
+                            ${item.desc ? `<div class="offer-desc-text">✨ ${item.desc}</div>` : ''}
+                            
+                            ${sizesHtml}
+
+                            <div class="item-notes-wrapper">
+                                <span class="item-notes-icon">✍️</span>
+                                <input type="text" class="item-notes-input" placeholder="ملاحظات العرض (مثل بيبسي زيرو، بدون مخلل...)">
+                            </div>
+
+                            <button class="order-btn offer-btn-style" onclick="addToCart(event, this, '${item.name}', '${item.img}')">اطلب العرض الآن 🔥</button>
+                        </div>
+                    </div>`;
+                }
+
+                // تصميم الكروت العادية للمنيو
                 return `
                 <div class="food-card" id="${item.id}" data-category="${item.category}" data-size="${defaultLabel}" data-price="${defaultPrice}">
                     <div class="food-card-top">
@@ -777,14 +894,14 @@
             container.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active')); 
             btn.classList.add('active');
             
-            const card = btn.closest('.food-card'); 
+            const card = btn.closest('.food-card') || btn.closest('.offer-card'); 
             card.querySelector('.food-price').innerText = price + ' ج.م';
             card.dataset.size = size; 
             card.dataset.price = price;
         }
 
         function addToCart(e, btn, name, img) {
-            const card = btn.closest('.food-card'); 
+            const card = btn.closest('.food-card') || btn.closest('.offer-card'); 
             const size = card.dataset.size; 
             const price = card.dataset.price; 
             const category = card.dataset.category || '';
@@ -797,9 +914,10 @@
             
             if(noteInput) noteInput.value = '';
 
+            const originalText = btn.innerText;
             btn.innerText = 'تم الطلب'; 
             btn.classList.add('added');
-            setTimeout(() => { btn.innerText = 'اطلب'; btn.classList.remove('added'); }, 2000);
+            setTimeout(() => { btn.innerText = originalText; btn.classList.remove('added'); }, 2000);
             
             const fly = document.createElement('div'); 
             fly.className = 'fly-item'; 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'takebreak-cache-v3';
+const CACHE_NAME = 'takebreak-cache-v4';
 
 // الملفات الأساسية للتطبيق التي يتم تخزينها مؤقتاً لسرعة التحميل
 const ASSETS_TO_CACHE = [
