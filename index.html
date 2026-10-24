@@ -231,7 +231,7 @@
             display: inline-block; 
         }
         
-        /* --- تصميم كروت قسم العروض (ظهور الصورة بالكامل دون قص الأطراف) --- */
+        /* --- تصميم كروت العروض (كلمة عرض خاص ناحية الشمال + صورة كاملة) --- */
         .offer-card {
             background: var(--white);
             border-radius: 24px;
@@ -244,18 +244,20 @@
             flex-direction: column;
             position: relative;
         }
+        /* تعديل: نقل الشارة إلى أقصى الشمال (Left: 12px) */
         .offer-badge-tag {
             position: absolute;
             top: 12px;
-            right: 12px;
-            background: var(--accent);
+            left: 12px; 
+            background: linear-gradient(135deg, var(--accent), var(--orange-dark));
             color: white;
             font-size: 0.78rem;
             font-weight: 900;
-            padding: 4px 14px;
+            padding: 5px 15px;
             border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             z-index: 2;
+            letter-spacing: 0.3px;
         }
         .offer-img-box {
             width: 100%;
@@ -263,7 +265,7 @@
             min-height: 180px;
             max-height: 380px;
             overflow: hidden;
-            background: #1a1512; /* خلفية متناسقة تظهر أطراف الصورة بأناقة */
+            background: #1a1512;
             position: relative;
             display: flex;
             justify-content: center;
@@ -273,7 +275,7 @@
             width: 100%;
             height: 100%;
             max-height: 380px;
-            object-fit: contain; /* إظهار الصورة بالكامل دون قص أي طرف */
+            object-fit: contain;
             transition: transform 0.4s ease;
         }
         .offer-card:hover .offer-img-box img {
@@ -448,38 +450,71 @@
 
         .fly-item { position: fixed; z-index: 9999; pointer-events: none; width: 30px; height: 30px; background: var(--orange); color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1); }
 
-        /* --- إشعار الهدايا الجذاب (Gift Toast Popup) --- */
+        /* --- تصميم جذاب وفاخر لجوانب إشعار الهدايا (Gift Toast Notification) --- */
         #gift-toast {
             position: fixed;
-            top: 20px;
+            top: 25px;
             left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: #28a745;
+            transform: translateX(-50%) translateY(-120px) scale(0.8);
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
             color: white;
-            padding: 14px 22px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+            padding: 14px 20px;
+            border-radius: 22px;
+            box-shadow: 0 12px 35px rgba(27, 94, 32, 0.45);
             z-index: 99999;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             font-weight: 800;
-            font-size: 0.92rem;
+            font-size: 0.95rem;
             opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 90%;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 92%;
+            width: 380px;
             text-align: right;
-            border: 2px solid #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
         }
         #gift-toast.show {
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(0) scale(1);
             opacity: 1;
+            animation: giftShake 0.6s ease-in-out 0.4s;
         }
-        .gift-toast-icon {
-            font-size: 1.8rem;
-            animation: bounce 1s infinite alternate;
+        @keyframes giftShake {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); }
+            20%, 60% { transform: translateX(-50%) translateY(0) rotate(-3deg); }
+            40%, 80% { transform: translateX(-50%) translateY(0) rotate(3deg); }
         }
-        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.2); } }
+        .gift-toast-icon-wrap {
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: pulseGiftIcon 1.2s infinite alternate ease-in-out;
+        }
+        @keyframes pulseGiftIcon {
+            from { transform: scale(0.95); }
+            to { transform: scale(1.15); }
+        }
+        .gift-toast-title {
+            font-size: 0.8rem;
+            color: #c8e6c9;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .gift-toast-body {
+            font-size: 0.98rem;
+            color: #ffeb3b;
+            font-weight: 900;
+            line-height: 1.3;
+            margin-top: 1px;
+        }
 
         /* --- شريط التثبيت الذكي --- */
         #install-bar {
@@ -573,12 +608,12 @@
         </div>
     </div>
 
-    <!-- نافذة الإشعارات للهدايا العائمة -->
+    <!-- نافذة الإشعارات للهدايا العائمة بتصميم أنيق جداً -->
     <div id="gift-toast">
-        <span class="gift-toast-icon">🎁</span>
+        <div class="gift-toast-icon-wrap">🎁</div>
         <div>
-            <div>مبارك! حصلت على هدية مجانية:</div>
-            <div id="gift-toast-text" style="color: #ffeb3b; font-size: 0.95rem;"></div>
+            <div class="gift-toast-title">مبارك! حصلت على هدية مجانية تلقائية 🎉</div>
+            <div id="gift-toast-text" class="gift-toast-body"></div>
         </div>
     </div>
 
@@ -694,6 +729,7 @@
         let selectedOrderType = 'delivery';
         let earnedGiftsList = [];
         let previousGiftKeys = new Set();
+        let toastTimeout;
 
         function adjustStickyCatNav() {
             const header = document.getElementById('mainHeader');
@@ -893,7 +929,7 @@
                     `</div>`;
                 }
 
-                // تصميم كروت العروض المميزة ذات الصورة الكاملة غير المقصوصة
+                // كروت العروض: كلمة "عرض خاص" في جهة الشمال وبدون قص للصور
                 if (isOfferCategory) {
                     return `
                     <div class="offer-card" id="${item.id}" data-category="${item.category}" data-size="${defaultLabel}" data-price="${defaultPrice}">
@@ -1014,89 +1050,95 @@
             }, 700);
         }
 
-        /* --- محرك حساب واكتشاف الهدايا والتنبيه الفوري --- */
+        /* --- محرك حساب دقيق جداً للهدايا طبقاً للتعليمات المطلوبة بالكامل --- */
         function checkGiftsLogic() {
             earnedGiftsList = [];
             const currentGiftKeys = new Set();
+            let newlyEarnedGift = '';
 
-            // 1. حساب وجبات الكريب
-            const crepeCount = cart.filter(i => (i.category && i.category.includes('كريب')) || (i.name && i.name.includes('كريب'))).length;
+            // 1. اي وجبتين كريب عليهم كريب بانيه بطاطس هديه
+            const crepeCount = cart.filter(i => (i.category && i.category.includes('كريب')) || (i.rawName && i.rawName.includes('كريب'))).length;
             const crepeGifts = Math.floor(crepeCount / 2);
             if (crepeGifts > 0) {
-                const giftTitle = `كريب بانيه بطاطس هدية 🎁${crepeGifts > 1 ? ` (عدد ${crepeGifts})` : ''}`;
-                earnedGiftsList.push(giftTitle);
+                const text = `كريب بانيه بطاطس هدية 🎁${crepeGifts > 1 ? ` (عدد ${crepeGifts})` : ''}`;
+                earnedGiftsList.push(text);
                 currentGiftKeys.add('crepe_' + crepeGifts);
+                if (!previousGiftKeys.has('crepe_' + crepeGifts)) newlyEarnedGift = text;
             }
 
-            // 2. حساب البيتزا الكبير
+            // 2. 2 بيتزا كبير عليهم بيتزا مارجريتا كبير هديه
             const pizzaLargeCount = cart.filter(i => 
-                ((i.category && i.category.includes('بيتزا')) || (i.name && i.name.includes('بيتزا'))) && 
+                ((i.category && i.category.includes('بيتزا')) || (i.rawName && i.rawName.includes('بيتزا'))) && 
                 i.size === 'كبير'
             ).length;
             const pizzaLargeGifts = Math.floor(pizzaLargeCount / 2);
             if (pizzaLargeGifts > 0) {
-                const giftTitle = `بيتزا مارجريتا كبير هدية 🎁${pizzaLargeGifts > 1 ? ` (عدد ${pizzaLargeGifts})` : ''}`;
-                earnedGiftsList.push(giftTitle);
+                const text = `بيتزا مارجريتا كبير هدية 🎁${pizzaLargeGifts > 1 ? ` (عدد ${pizzaLargeGifts})` : ''}`;
+                earnedGiftsList.push(text);
                 currentGiftKeys.add('pizza_large_' + pizzaLargeGifts);
+                if (!previousGiftKeys.has('pizza_large_' + pizzaLargeGifts)) newlyEarnedGift = text;
             }
 
-            // 3. حساب بيتزا مارجريتا وسط
-            const margheritaMediumCount = cart.filter(i => 
+            // 3. 2 بيتزا مارجريتا وسط عليهم بيتزا مارجريتا وسط هديه
+            const margheritaMedCount = cart.filter(i => 
                 i.rawName && i.rawName.includes('مارجريتا') && 
                 i.size === 'وسط'
             ).length;
-            const margheritaMediumGifts = Math.floor(margheritaMediumCount / 2);
-            if (margheritaMediumGifts > 0) {
-                const giftTitle = `بيتزا مارجريتا وسط هدية 🎁${margheritaMediumGifts > 1 ? ` (عدد ${margheritaMediumGifts})` : ''}`;
-                earnedGiftsList.push(giftTitle);
-                currentGiftKeys.add('margherita_med_' + margheritaMediumGifts);
+            const margheritaMedGifts = Math.floor(margheritaMedCount / 2);
+            if (margheritaMedGifts > 0) {
+                const text = `بيتزا مارجريتا وسط هدية 🎁${margheritaMedGifts > 1 ? ` (عدد ${margheritaMedGifts})` : ''}`;
+                earnedGiftsList.push(text);
+                currentGiftKeys.add('margherita_med_' + margheritaMedGifts);
+                if (!previousGiftKeys.has('margherita_med_' + margheritaMedGifts)) newlyEarnedGift = text;
             }
 
-            // 4. حساب البروست
+            // 4. اي وجبتين بروست عليهم وجبه استربس قطعتين هديه
             const broastCount = cart.filter(i => 
-                ((i.category && i.category.includes('بروست')) || (i.name && i.name.includes('بروست'))) &&
-                !i.name.includes('سنجل')
+                ((i.category && i.category.includes('بروست')) || (i.rawName && i.rawName.includes('بروست'))) &&
+                !i.rawName.includes('سنجل')
             ).length;
             const broastGifts = Math.floor(broastCount / 2);
             if (broastGifts > 0) {
-                const giftTitle = `وجبة استربس قطعتين هدية 🎁${broastGifts > 1 ? ` (عدد ${broastGifts})` : ''}`;
-                earnedGiftsList.push(giftTitle);
+                const text = `وجبة استربس قطعتين هدية 🎁${broastGifts > 1 ? ` (عدد ${broastGifts})` : ''}`;
+                earnedGiftsList.push(text);
                 currentGiftKeys.add('broast_' + broastGifts);
+                if (!previousGiftKeys.has('broast_' + broastGifts)) newlyEarnedGift = text;
             }
 
-            // 5. حساب بروست سنجل
-            const broastSingleCount = cart.filter(i => i.name && i.name.includes('بروست') && i.name.includes('سنجل')).length;
+            // 5. 2 بروست سنجل وخد ال 3 هديه (أي شراء 2 بروست سنجل يمنح الوجبة الثالثة هدية)
+            const broastSingleCount = cart.filter(i => i.rawName && i.rawName.includes('بروست') && i.rawName.includes('سنجل')).length;
             const broastSingleGifts = Math.floor(broastSingleCount / 2);
             if (broastSingleGifts > 0) {
-                const giftTitle = `وجبة بروست سنجل (الوجبة الـ 3) هدية 🎁${broastSingleGifts > 1 ? ` (عدد ${broastSingleGifts})` : ''}`;
-                earnedGiftsList.push(giftTitle);
+                const text = `وجبة بروست سنجل الـ 3 هدية 🎁${broastSingleGifts > 1 ? ` (عدد ${broastSingleGifts})` : ''}`;
+                earnedGiftsList.push(text);
                 currentGiftKeys.add('broast_single_' + broastSingleGifts);
+                if (!previousGiftKeys.has('broast_single_' + broastSingleGifts)) newlyEarnedGift = text;
             }
 
-            // 6. حساب وجبات عربي
-            const arabiCount = cart.filter(i => (i.category && i.category.includes('عربي')) || (i.name && i.name.includes('عربي'))).length;
+            // 6. وجبتين عربي عليهم وجبه هديه
+            const arabiCount = cart.filter(i => (i.category && i.category.includes('عربي')) || (i.rawName && i.rawName.includes('عربي'))).length;
             const arabiGifts = Math.floor(arabiCount / 2);
             if (arabiGifts > 0) {
-                const giftTitle = `وجبة عربي هدية 🎁${arabiGifts > 1 ? ` (عدد ${arabiGifts})` : ''}`;
-                earnedGiftsList.push(giftTitle);
+                const text = `وجبة عربي هدية 🎁${arabiGifts > 1 ? ` (عدد ${arabiGifts})` : ''}`;
+                earnedGiftsList.push(text);
                 currentGiftKeys.add('arabi_' + arabiGifts);
+                if (!previousGiftKeys.has('arabi_' + arabiGifts)) newlyEarnedGift = text;
             }
 
-            // 7. حساب شاورما كيزر
-            const kaiserCount = cart.filter(i => i.name && i.name.includes('كيزر')).length;
+            // 7. 4 شاورما كيزر عليهم 4 هديه
+            const kaiserCount = cart.filter(i => i.rawName && i.rawName.includes('كيزر')).length;
             const kaiserGifts = Math.floor(kaiserCount / 4);
             if (kaiserGifts > 0) {
-                const giftTitle = `4 شاورما كيزر هدية 🎁${kaiserGifts > 1 ? ` (مضاعف x${kaiserGifts})` : ''}`;
-                earnedGiftsList.push(giftTitle);
+                const text = `4 شاورما كيزر هدية 🎁${kaiserGifts > 1 ? ` (مضاعف x${kaiserGifts})` : ''}`;
+                earnedGiftsList.push(text);
                 currentGiftKeys.add('kaiser_' + kaiserGifts);
+                if (!previousGiftKeys.has('kaiser_' + kaiserGifts)) newlyEarnedGift = text;
             }
 
-            currentGiftKeys.forEach(key => {
-                if (!previousGiftKeys.has(key)) {
-                    const giftText = earnedGiftsList[earnedGiftsList.length - 1];
-                    showGiftToast(giftText);
-                }
-            });
+            // إذا تحققت هدية جديدة تظهر بالنوتيفيكيشن فوراً
+            if (newlyEarnedGift) {
+                showGiftToast(newlyEarnedGift);
+            }
             previousGiftKeys = currentGiftKeys;
         }
 
@@ -1105,10 +1147,14 @@
             const toastText = document.getElementById('gift-toast-text');
             if (toast && toastText) {
                 toastText.innerText = text;
+                toast.classList.remove('show');
+                void toast.offsetWidth; // Trigger reflow
                 toast.classList.add('show');
-                setTimeout(() => {
+                
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
                     toast.classList.remove('show');
-                }, 4000);
+                }, 4500);
             }
         }
 
@@ -1195,7 +1241,7 @@
             const a = document.getElementById('uAddr').value.trim();
             
             if (!n || !p || cart.length === 0) {
-                return alert("يرجى إكمال البيانات واختيار الأصناف");
+                return alert("يرجى إكمال البيانات وااختيار الأصناف");
             }
             if (selectedOrderType === 'delivery' && !a) {
                 return alert("يرجى إدخال عنوان التوصيل بالتفصيل");
